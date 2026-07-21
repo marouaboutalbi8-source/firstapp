@@ -1250,6 +1250,235 @@ def c_r14(pf, ax, ay, aw, ah, req):
     return "".join(s)
 
 
+# ====================================================================== R15
+R15 = dict(
+    id="FR-KB", headline="Knowledge Management & Self-service Deflection",
+    title="Knowledge & Self-service",
+    sources=["RFP §5.2", "BRD §17.2 / §3.1", "Proposal — knowledge & FCR"],
+    text=["Knowledge articles support first-contact resolution across departments.",
+          "Agents surface relevant knowledge in context; customers self-serve on the portal.",
+          "Multilingual content (including Arabic) for the Qatar market."],
+    addressed=["A searchable knowledge base backs every service interaction.",
+               "Relevant articles are surfaced on the case for first-contact resolution.",
+               "The same articles power self-service deflection on the Insursa portal.",
+               "Articles are versioned, approved and available in English and Arabic."],
+)
+
+
+def c_r15(pf, ax, ay, aw, ah, req):
+    prim, deep = pf["primary"], pf["deep"]
+    win, (cx, cy, cw, ch) = _content(pf, ax, ay, aw, ah, "Knowledge  ›  KB-118", "KB-118")
+    s = [win]
+    ix, iw = cx + 16, cw - 32
+    top = cy + 14
+    gap = 14
+    lw = iw * 0.26
+    mw = iw * 0.44
+    rw = iw - lw - mw - gap * 2
+    bh = cy + ch - top - 14
+    # left: article list (callout 1)
+    s.append(card(ix, top, lw, bh, "Knowledge base", "case", prim, pf=pf))
+    s.append(callout(1, ix + lw - 12, top + 12))
+    arts = [("KB-118 Policy reinstatement", "Motor · Property", "1.2k", True),
+            ("KB-204 Auto-renewal failure", "Billing", "980", False),
+            ("KB-090 Goodwill & waiver", "Complaints", "640", False),
+            ("KB-152 Medical card reissue", "Medical", "1.5k", False),
+            ("KB-061 Claim status FAQ", "Claims", "2.1k", False),
+            ("KB-133 WhatsApp opt-in", "Channels", "410", False)]
+    ay2 = top + 48
+    for t, cat, views, act in arts:
+        if act:
+            s.append(rrect(ix + 8, ay2, lw - 16, 44, r=6, fill="#EAF2FB"))
+            s.append(rrect(ix + 8, ay2, 3, 44, fill=prim))
+        s.append(txt(ix + 18, ay2 + 18, t, size=9.8, color=UI["ink"], weight="700"))
+        s.append(txt(ix + 18, ay2 + 33, f"{cat} · {views} views", size=8.4, color=UI["sub"], weight="500"))
+        ay2 += 48
+    # middle: article view (callout 2/4)
+    mxr = ix + lw + gap
+    s.append(card(mxr, top, mw, bh, "KB-118 · Policy reinstatement after lapse", "case", prim, pf=pf))
+    s.append(callout(2, mxr + mw - 12, top + 12))
+    s.append(chip(mxr + 16, top + 48, 74, 18, "Published", "#E4F5EC", text_color="#0B875B", size=8.6, r=9))
+    s.append(chip(mxr + 96, top + 48, 90, 18, "EN · العربية", pf["chip_bg"], text_color=pf["primary_dk"], size=8.6, r=9))
+    s.append(chip(mxr + 192, top + 48, 70, 18, "v3 · 2026", QIC["band"], text_color=QIC["slate2"], size=8.6, r=9))
+    s.append(callout(4, mxr + 96, top + 44))
+    lines = ["Summary", "When a policy lapses after an auto-renewal payment failure, it can be",
+             "reinstated within the grace window on receipt of the outstanding premium.",
+             "", "Steps", "1. Confirm the customer identity against the Customer Master.",
+             "2. Verify the lapsed policy and outstanding premium from Azentio.",
+             "3. Issue a secure SkipCash payment link for the premium due.",
+             "4. On payment confirmation, request reinstatement in the core system.",
+             "5. Log the interaction and close the case with the reinstatement outcome.",
+             "", "Related: KB-204 (auto-renewal failure) · KB-090 (goodwill & waiver)"]
+    tyy = top + 78
+    for ln in lines:
+        b = ln in ("Summary", "Steps")
+        s.append(txt(mxr + 18, tyy, ln, size=(10.4 if b else 9.6),
+                     color=(deep if b else UI["ink"]), weight=("800" if b else "500")))
+        tyy += 16 if ln else 9
+    # right: deflection + related (callout 3)
+    rxr = ix + lw + mw + gap * 2
+    s.append(card(rxr, top, rw, bh * 0.5 - 7, "Self-service deflection", "gauge", prim, pf=pf))
+    s.append(callout(3, rxr + rw - 12, top + 12))
+    s.append(gauge_ring(rxr + rw/2, top + 96, 42, 0.63, "#0B875B", "Portal deflection rate", "63%"))
+    s.append(txt(rxr + rw/2, top + 150, "cases avoided via Insursa self-service", size=8.6, color=UI["sub"], weight="500", anchor="middle"))
+    ry2 = top + bh*0.5 + 7
+    s.append(card(rxr, ry2, rw, bh*0.5 - 7, "Used on cases", "case", prim, pf=pf))
+    ky = ry2 + 48
+    for cs, st in [("INC-2043", "linked"), ("TKT-3120", "resolved FCR"), ("CMP-3021", "referenced")]:
+        s.append(rrect(rxr + 12, ky, rw - 24, 30, r=6, fill=UI["field"], stroke=UI["cardline"], sw=1))
+        s.append(txt(rxr + 22, ky + 19, cs, size=10, color=UI["ink"], weight="700"))
+        s.append(txt(rxr + rw - 22, ky + 19, st, size=8.8, color=prim, weight="600", anchor="end"))
+        ky += 36
+    return "".join(s)
+
+
+# ====================================================================== R16
+R16 = dict(
+    id="FR-Cmp", headline="Complaints Management & Regulatory Handling",
+    title="Complaints & Regulatory (QCB)",
+    sources=["RFP §5.2 / §15", "BRD §11.5 / §2.3", "Proposal — Complaints dept."],
+    text=["Standardized complaint handling for the Complaints Management department.",
+          "Regulatory tracking aligned to QCB and Qatari data-protection obligations.",
+          "Root-cause, redress, resolution and full audit for regulatory reporting."],
+    addressed=["Complaints are a dedicated case type with a High-priority SLA (30 min / 1 day).",
+               "Regulatory fields capture QCB-reportability, category and redress.",
+               "Multi-level escalation reaches management for high-impact complaints.",
+               "Every action is audited and reportable for compliance review."],
+)
+
+
+def c_r16(pf, ax, ay, aw, ah, req):
+    prim, deep = pf["primary"], pf["deep"]
+    win, (cx, cy, cw, ch) = _content(pf, ax, ay, aw, ah, "Cases  ›  CMP-3021 · Complaint", "CMP-3021")
+    s = [win]
+    ix, iw = cx + 16, cw - 32
+    top = cy + 14
+    # header
+    s.append(rrect(ix, top, iw, 56, r=8, fill="#fff", stroke=UI["cardline"], sw=1.1))
+    s.append(rrect(ix, top, 4, 56, r=2, fill="#C0392B"))
+    s.append(mini_chip("case", "#C0392B", ix + 14, top + 14, 28, cloud=(pf["key"]=="salesforce")))
+    s.append(txt(ix + 54, top + 24, "CMP-3021 · Billing complaint — duplicate premium charge", size=14, color=UI["ink"], weight="800"))
+    s.append(txt(ix + 54, top + 43, "Fatima Al-Ansari · Complaints Management · opened 6h ago", size=10, color=UI["sub"], weight="500"))
+    s.append(chip(ix + iw - 214, top + 18, 92, 20, "Complaint", "#FDECEC", text_color="#B4342B", size=10, r=10))
+    s.append(chip(ix + iw - 114, top + 18, 100, 20, "QCB reportable", "#FBF1DA", text_color="#8A6D1E", size=9, r=10))
+    # chevrons
+    chy = top + 64
+    s.append(chevrons(ix, chy, iw, 32, ["Logged", "Acknowledged", "Investigation", "Redress", "Resolved", "Closed"], 2, "#C0392B", done_color="#B4342B"))
+    by = chy + 48
+    bh = cy + ch - by - 14
+    gap = 14
+    mw = iw * 0.56
+    rw = iw - mw - gap
+    # left: complaint + regulatory (callout 1/2/3)
+    s.append(card(ix, by, mw, bh, "Complaint detail & regulatory tracking", "shield", "#C0392B", pf=pf))
+    s.append(callout(1, ix + mw*0.5, by + 12))
+    fx = ix + 16
+    fw = (mw - 32 - 12) / 2
+    dets = [("Complaint category", "Billing · duplicate charge"), ("Channel", "WhatsApp → phone"),
+            ("Priority / SLA", "High · 30 min / 1 day"), ("Owner", "M. Haddad (Complaints)"),
+            ("QCB reportable", "Yes · logged 21 Jul"), ("Data-protection flag", "None"),
+            ("Root cause", "Auto-renewal double-run"), ("Redress", "Refund QAR 6,200 + apology")]
+    for i, (lb, vv) in enumerate(dets):
+        col = i % 2; row = i // 2
+        reg = lb in ("QCB reportable", "Data-protection flag", "Root cause", "Redress")
+        s.append(field_box(fx + col*(fw+12), by + 52 + row*54, fw, lb, vv,
+                           vcolor=("#8A6D1E" if lb == "QCB reportable" else UI["ink"])))
+    s.append(callout(2, fx + fw*2 + 6, by + 52 + 2*54))
+    s.append(callout(3, fx + fw*2 + 6, by + 52 + 3*54))
+    # right: SLA + escalation + audit (callout 4)
+    rxr = ix + mw + gap
+    s.append(card(rxr, by, rw, bh, "SLA · escalation · audit", "clock", prim, pf=pf))
+    s.append(callout(4, rxr + rw - 12, by + 12))
+    s.append(rrect(rxr + 12, by + 48, rw - 24, 40, r=8, fill="#FDECEC"))
+    s.append(txt(rxr + 22, by + 66, "Resolution SLA", size=9, color="#B4342B", weight="700"))
+    s.append(txt(rxr + rw - 22, by + 66, "00:22 left", size=13, color="#B4342B", weight="800", anchor="end"))
+    s.append(txt(rxr + 22, by + 80, "High priority · 1 business day", size=8.4, color="#B4342B", weight="500"))
+    hy = by + 100
+    for g, gc, tt, sub, wn in [("case", "#C0392B", "Complaint logged", "WhatsApp · agent L. Fahad", "6h"),
+                                ("people", prim, "Acknowledged to customer", "SLA ack 30 min", "6h"),
+                                ("bolt", "#E8A33D", "Escalated → manager", "QCB reportable", "5h"),
+                                ("flow", prim, "Root cause identified", "billing system", "3h"),
+                                ("mail", prim, "Redress approved", "refund + apology", "1h"),
+                                ("lock", GOLD, "Audit entry · reportable", "compliance pack", "1h")]:
+        s.append(timeline_item(rxr + 12, hy, rw - 24, g, gc, tt, sub, wn))
+        hy += 48
+    return "".join(s)
+
+
+# ====================================================================== R17
+R17 = dict(
+    id="FR-Exec", headline="Executive & Management Reporting",
+    title="Executive Management Dashboard",
+    sources=["RFP §10.2", "BRD §12.2 / §13.3", "Proposal — management visibility"],
+    text=["Management and executive reporting for departmental performance and service trends.",
+          "KPI monitoring: SLA, resolution, escalation analysis, customer-servicing trends.",
+          "Real-time oversight with drill-down and export."],
+    addressed=["Executive KPI tiles give management real-time operational oversight.",
+               "Service and satisfaction trends are tracked over time.",
+               "A departmental league table ranks performance against SLA.",
+               "Escalation analysis and export support governance review."],
+)
+
+
+def c_r17(pf, ax, ay, aw, ah, req):
+    prim, deep = pf["primary"], pf["deep"]
+    tool = "Power BI" if pf["key"] == "microsoft" else "CRM Analytics"
+    win, (cx, cy, cw, ch) = _content(pf, ax, ay, aw, ah, f"Dashboards  ›  Executive ({tool})", "Executive")
+    s = [win]
+    ix, iw = cx + 16, cw - 32
+    top = cy + 14
+    # KPI tiles (callout 1)
+    tiles = [("92.4%", "CSAT (30d)", "#0B875B", "▲ 1.8"), ("94.6%", "SLA compliance", prim, "▲ 1.2"),
+             ("4.6h", "Avg resolution", "#3E7CB1", "▼ 0.4h"), ("1,204", "Cases MTD", "#E8A33D", "▲ 6%"),
+             ("88%", "Retention (YTD)", "#7A5CC0", "▲ 2%")]
+    tw = (iw - 4*12) / 5
+    for i, (v, l, c, d) in enumerate(tiles):
+        s.append(stat_tile(ix + i*(tw+12), top, tw, 64, v, l, c, sub=d))
+    s.append(callout(1, ix + tw - 6, top))
+    # charts row
+    ry = top + 78
+    rh = (cy + ch - ry - 14) * 0.5
+    gap = 12
+    c1 = iw * 0.42
+    c2 = iw * 0.3
+    c3 = iw - c1 - c2 - gap*2
+    # trend (callout 2)
+    s.append(card(ix, ry, c1, rh, "Service & satisfaction trend (6 months)", "gauge", prim, pf=pf))
+    s.append(callout(2, ix + c1 - 12, ry + 12))
+    s.append(line_chart(ix + 16, ry + 54, c1 - 32, rh - 96, [86, 88, 87, 90, 91, 92], "#0B875B"))
+    s.append(line_chart(ix + 16, ry + 54, c1 - 32, rh - 96, [78, 80, 83, 82, 85, 87], prim))
+    s.append(txt(ix + 20, ry + rh - 22, "— CSAT   — SLA compliance", size=9, color=UI["sub"], weight="600"))
+    # escalation donut (callout 4)
+    s.append(card(ix + c1 + gap, ry, c2, rh, "Escalations by level", "pbi", prim, pf=pf))
+    s.append(callout(4, ix + c1 + gap + c2 - 12, ry + 12))
+    s.append(donut(ix + c1 + gap + c2*0.34, ry + rh*0.56, min(rh*0.28, 52),
+                   [(52, prim), (28, "#E8A33D"), (14, "#C0392B"), (6, "#7A5CC0")]))
+    ly = ry + 54
+    for lbl, cc in [("L1 52%", prim), ("L2 28%", "#E8A33D"), ("L3 14%", "#C0392B"), ("L4 6%", "#7A5CC0")]:
+        s.append(f'<rect x="{ix+c1+gap+c2*0.6}" y="{ly-8}" width="10" height="10" rx="2" fill="{cc}"/>')
+        s.append(txt(ix + c1 + gap + c2*0.6 + 15, ly, lbl, size=9, color=UI["ink"], weight="600"))
+        ly += 19
+    # gauges (callout)
+    s.append(card(ix + c1 + c2 + gap*2, ry, c3, rh, "This month", "gauge", prim, pf=pf))
+    s.append(gauge_ring(ix + c1 + c2 + gap*2 + c3/2, ry + rh*0.55, min(rh*0.3, 50), 0.946, "#0B875B", "SLA vs 90% target", "94.6%"))
+    # league table (callout 3)
+    by = ry + rh + 14
+    bh2 = cy + ch - by - 14
+    s.append(card(ix, by, iw, bh2, "Departmental performance league — ranked by SLA (drill-down · export)", "pbi", prim, pf=pf))
+    s.append(chip(ix + iw - 132, by + 12, 56, 18, "Export", pf["chip_bg"], text_color=pf["primary_dk"], size=8.6, r=9))
+    s.append(chip(ix + iw - 72, by + 12, 56, 18, "Subscribe", pf["chip_bg"], text_color=pf["primary_dk"], size=8.4, r=9))
+    s.append(callout(3, ix + iw - 12, by + 12))
+    cols = ["Rank", "Department", "CSAT", "SLA %", "Avg resolution", "Escalations", "Trend"]
+    colw = [iw*0.08, iw*0.24, iw*0.12, iw*0.13, iw*0.18, iw*0.14, iw*0.11]
+    rows = [["1", "Sales & BD", ("95%", "#0B875B"), ("95%", "#0B875B"), "2.6h", "1", ("▲", "#0B875B")],
+            ["2", "Customer Service", ("93%", "#0B875B"), ("96%", "#0B875B"), "3.2h", "4", ("▲", "#0B875B")],
+            ["3", "Underwriting", ("90%", "#0B875B"), ("93%", "#0B875B"), "6.1h", "3", ("▬", "#E8A33D")],
+            ["4", "Claims", ("89%", "#E8A33D"), ("91%", "#0B875B"), "5.4h", "7", ("▲", "#0B875B")],
+            ["5", "Complaints", ("84%", "#E8A33D"), ("89%", "#E8A33D"), "8.0h", "11", ("▼", "#C0392B")]]
+    s.append(table(ix + 12, by + 42, iw - 24, cols, rows, colw, rowh=(bh2-54)/6))
+    return "".join(s)
+
+
 CARDS = [
     ("r1-customer360", R1, c_r1),
     ("r2-interaction-log", R2, c_r2),
@@ -1265,6 +1494,9 @@ CARDS = [
     ("r12-ai-assist", R12, c_r12),
     ("r13-notifications", R13, c_r13),
     ("r14-mobile", R14, c_r14),
+    ("r15-knowledge", R15, c_r15),
+    ("r16-complaints", R16, c_r16),
+    ("r17-executive", R17, c_r17),
 ]
 
 

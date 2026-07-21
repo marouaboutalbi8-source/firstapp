@@ -26,6 +26,7 @@ python3 build/diagrams.py all && python3 build/render.py`.
 | — | Integration & Data Flow | `png/ms-02-integration.png` | `png/sf-02-integration.png` |
 | — | Case Lifecycle · SLA & Escalation | `png/ms-03-process.png` | `png/sf-03-process.png` |
 | — | Functional Capability Map | `png/ms-04-capability-map.png` | `png/sf-04-capability-map.png` |
+| — | Implementation Roadmap & Phasing | `png/ms-05-roadmap.png` | `png/sf-05-roadmap.png` |
 
 ## Requirement → realized in product
 
@@ -45,6 +46,9 @@ python3 build/diagrams.py all && python3 build/render.py`.
 | AI | Governed AI Assistance for Service & Sales | RFP §17 (future); BRD §13.5 / §16.5; Proposal §04 AI | `png/ms-r12-ai-assist.png` | `png/sf-r12-ai-assist.png` |
 | FR-Ntf | Notifications & Follow-up Management | RFP §5.3; BRD §11.6 / §7.7; Proposal — automation | `png/ms-r13-notifications.png` | `png/sf-r13-notifications.png` |
 | NFR-Usab | Responsive Web & Mobile Access | RFP §6; BRD §8.3 / §17.3; Proposal NFR — usability | `png/ms-r14-mobile.png` | `png/sf-r14-mobile.png` |
+| FR-KB | Knowledge Management & Self-service Deflection | RFP §5.2; BRD §17.2 / §3.1; Proposal — knowledge & FCR | `png/ms-r15-knowledge.png` | `png/sf-r15-knowledge.png` |
+| FR-Cmp | Complaints Management & Regulatory Handling | RFP §5.2 / §15; BRD §11.5 / §2.3; Proposal — Complaints dept. | `png/ms-r16-complaints.png` | `png/sf-r16-complaints.png` |
+| FR-Exec | Executive & Management Reporting | RFP §10.2; BRD §12.2 / §13.3; Proposal — management visibility | `png/ms-r17-executive.png` | `png/sf-r17-executive.png` |
 
 ## Layout
 

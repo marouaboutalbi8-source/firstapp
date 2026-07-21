@@ -370,10 +370,113 @@ def d4(pf):
     return "".join(s)
 
 
+# ==================================================================== D5
+def d5(pf):
+    prim, deep = pf["primary"], pf["deep"]
+    s = [canvas_open(pf)]
+    s.append(header(pf, "DELIVERY ROADMAP",
+                    "Implementation Roadmap & Phasing",
+                    "Governed five-phase delivery · production go-live in 20–24 weeks · one accountable prime"))
+    LX, RX = 40, W - 40
+    top = 140
+    # ---- delivery timeline (weeks) ----
+    s.append(txt(LX, top, "DELIVERY LIFECYCLE — indicative 24-week schedule", size=12, color=deep, weight="800", spacing="0.5"))
+    tl_y = top + 20
+    tl_w = RX - LX
+    weeks = 24
+    # week grid
+    s.append(rrect(LX, tl_y, tl_w, 30, r=6, fill=QIC["band"]))
+    for wk in range(0, weeks + 1, 2):
+        gx = LX + tl_w * wk / weeks
+        s.append(line(gx, tl_y, gx, tl_y + 210, color=QIC["line"], w=1, opacity=0.6))
+        s.append(txt(gx + 3, tl_y + 20, f"W{wk}", size=8.6, color=QIC["sub"], weight="600"))
+    phases = [
+        ("Phase 1 · Discovery & Design", 0, 4, prim, "workshops · design · SbD review"),
+        ("Phase 2 · Configuration & Integration", 4, 14, "#3E7CB1", "build · 9 interfaces · SIT"),
+        ("Phase 3 · Testing & UAT", 14, 18, "#E8A33D", "SIT · UAT · defect resolution"),
+        ("Phase 4 · Go-live", 18, 22, "#0B875B", "cutover · hypercare"),
+        ("Phase 5 · Support", 22, 24, "#7A5CC0", "transition"),
+    ]
+    bar_y = tl_y + 42
+    for i, (nm, w0, w1, cc, sub) in enumerate(phases):
+        bx = LX + tl_w * w0 / weeks
+        bw = tl_w * (w1 - w0) / weeks
+        s.append(rrect(bx + 3, bar_y + i*34, bw - 6, 28, r=6, fill=cc))
+        s.append(txt(bx + 12, bar_y + i*34 + 14, nm, size=9.8, color="#fff", weight="800"))
+        s.append(txt(bx + 12, bar_y + i*34 + 25, sub, size=8, color="#ffffff", weight="500", opacity=0.9))
+    # gates
+    gate_y = bar_y + 5*34 + 6
+    for wk, lb in [(4, "Design sign-off"), (14, "Build complete"), (18, "UAT sign-off"), (22, "Go-live")]:
+        gx = LX + tl_w * wk / weeks
+        s.append(f'<path d="M{gx} {gate_y} l7 8 l-7 8 l-7 -8 Z" fill="{QIC["gold"]}"/>')
+        s.append(txt(gx + 12, gate_y + 13, lb, size=8.6, color=QIC["maroon_dk"], weight="700"))
+    # ---- capability roadmap (product phases) ----
+    cy2 = gate_y + 44
+    s.append(txt(LX, cy2, "CAPABILITY ROADMAP — value released each phase, no re-platforming", size=12, color=deep, weight="800", spacing="0.5"))
+    proll = [
+        ("PHASE 1", "Core CRM & operations", prim,
+         ["Interaction logging & Customer 360", "Ticket / incident & SLA workflow",
+          "Omnichannel servicing", "Priority integrations (CMDB, Azentio, WABA, M365, 3CX)",
+          "Operational dashboards"]),
+        ("PHASE 2", "Mobility & workflow expansion", "#3E7CB1",
+         ["Mobile enhancements", "Geo-tagging & voice-to-text", "Expanded automation",
+          "Additional dashboards", "Enhanced omnichannel"]),
+        ("PHASE 3", "Financial & operational enablement", "#E8A33D",
+         ["Finance & collections visibility", "Premium tracking", "Reinsurance servicing",
+          "Expanded portal integration", "Advanced reporting"]),
+        ("PHASE 4", "Digital & AI enablement", "#7A5CC0",
+         [f"{pf['ai']} operational insights", "Predictive analytics", "Customer segmentation",
+          "Retention & cross-sell analytics", "Enhanced self-service"]),
+    ]
+    n = len(proll)
+    gap = 16
+    cw = (RX - LX - (n-1)*gap) / n
+    py = cy2 + 14
+    pch = 258
+    for i, (ph, title, cc, items) in enumerate(proll):
+        x = LX + i*(cw + gap)
+        s.append(rrect(x, py, cw, pch, r=14, fill="#fff", stroke=QIC["line"], sw=1.4))
+        s.append(f'<g filter="url(#dsSoft)">' + rrect(x, py, cw, pch, r=14, fill="none") + '</g>')
+        s.append(rrect(x, py, cw, 56, r=14, fill=cc))
+        s.append(rrect(x, py + 30, cw, 26, fill=cc))
+        s.append(txt(x + 16, py + 24, ph, size=11.5, color="#fff", weight="800", spacing="1"))
+        s.append(txt(x + 16, py + 44, title, size=10.6, color="#fff", weight="600"))
+        iy = py + 74
+        for it in items:
+            s.append(f'<circle cx="{x+22}" cy="{iy-3}" r="2.6" fill="{cc}"/>')
+            wt, nl = wraptext(x + 32, iy, it, 10, UI["ink"] if False else QIC["ink"], weight="500", anchor="start", max_chars=26, lh=13)
+            s.append(wt)
+            iy += nl*13 + 12
+        if i < n - 1:
+            s.append(f'<path d="M{x+cw+2} {py+pch/2-8} l10 8 l-10 8 Z" fill="{QIC["sub"]}"/>')
+    # ---- delivery governance & assurance band ----
+    gy = py + pch + 16
+    gh = (H - FOOTER_H - 14) - gy
+    s.append(rrect(LX, gy, RX-LX, gh, r=14, fill="url(#pfBand)"))
+    envision = "Microsoft Catalyst" if pf["key"] == "microsoft" else "value-envisioning"
+    assure = "Success by Design (FastTrack)" if pf["key"] == "microsoft" else "vendor-recommended delivery practice"
+    s.append(txt(LX + 20, gy + 30, "DELIVERY GOVERNANCE & ASSURANCE — one accountable prime (Trion × Volge)", size=12, color="#fff", weight="800", spacing="0.5"))
+    gov = [("Envision", envision + " · value-anchored"),
+           ("Assure", assure),
+           ("Deliver", "5 quality-gated phases · PMI PMBOK governance"),
+           ("Adopt", "training · change management · hypercare")]
+    gwn = (RX - LX - 40 - 3*12) / 4
+    for i, (t, d) in enumerate(gov):
+        px = LX + 20 + i*(gwn+12)
+        s.append(rrect(px, gy + 44, gwn, gh - 60, r=10, fill="#ffffff", opacity=0.14))
+        s.append(txt(px + 14, gy + 68, t, size=12, color="#fff", weight="800"))
+        wt, _ = wraptext(px + 14, gy + 88, d, 9.4, "#DCE8F5", weight="500", anchor="start", max_chars=30, lh=13)
+        s.append(wt)
+    s.append(footer(pf, "Implementation Roadmap · 5 of 5"))
+    s.append(canvas_close())
+    return "".join(s)
+
+
 if __name__ == "__main__":
     import sys
     which = sys.argv[1] if len(sys.argv) > 1 else "all"
-    fns = {"d2": (d2, "02-integration"), "d3": (d3, "03-process"), "d4": (d4, "04-capability-map")}
+    fns = {"d2": (d2, "02-integration"), "d3": (d3, "03-process"),
+           "d4": (d4, "04-capability-map"), "d5": (d5, "05-roadmap")}
     for key, (fn, slug) in fns.items():
         if which not in ("all", key):
             continue

@@ -233,89 +233,144 @@ def app_window(pf, x, y, w, h, breadcrumb, record_title):
 
 def _chrome_ms(pf, x, y, w, h, breadcrumb, record_title):
     s = []
-    # top app bar (dark)
-    hb = 40
+    # ---- top app bar (dark navy — Unified Interface) ----
+    hb = 42
+    appname = _ms_appname(breadcrumb)
     s.append(rrect(x, y, w, hb, fill=UI["ms_topbar"]))
-    s.append(waffle(x + 16, y + hb/2 - 5, c="#ffffff", s=2.8, gap=2.2))
-    s.append(txt(x + 44, y + hb/2 + 4, "Dynamics 365", size=13, color="#fff", weight="700"))
-    s.append(txt(x + 150, y + hb/2 + 4, breadcrumb, size=11, color="#AEC3DA", weight="500"))
+    s.append(waffle(x + 16, y + hb/2 - 5, c="#ffffff", s=2.9, gap=2.3))
+    s.append(txt(x + 42, y + hb/2 + 4, "Dynamics 365", size=12.6, color="#fff", weight="700"))
+    s.append(line(x + 148, y + 10, x + 148, y + hb - 10, color="#3a5170", w=1))
+    s.append(txt(x + 162, y + hb/2 + 4, appname, size=11.4, color="#DCE8F5", weight="600"))
+    # center search
+    sw_ = 380
+    s.append(rrect(x + w/2 - sw_/2, y + 8, sw_, hb - 16, r=4, fill="#12324f", stroke="#284a6e", sw=1))
+    s.append(txt(x + w/2 - sw_/2 + 14, y + hb/2 + 4, "⌕  Search", size=10.4, color="#8AA2BC", weight="500"))
     # right icons
     rx = x + w - 20
-    for lbl in ["?", "⚙", "▣", "⌕"]:
-        s.append(txt(rx, y + hb/2 + 4, lbl, size=12, color="#CBD8E6", anchor="end"))
-        rx -= 26
+    for lbl in ["➕", "⚙", "?", "▣", "◔"]:
+        s.append(txt(rx, y + hb/2 + 4.5, lbl, size=11.5, color="#B9CBDD", anchor="end"))
+        rx -= 25
     s.append(avatar(x + w - 22, y + hb/2, 11, "SA", "#C9A24B"))
-    # command bar (light)
+    # ---- command bar (light) ----
     y2 = y + hb
-    cb = 34
+    cb = 36
     s.append(rrect(x, y2, w, cb, fill=UI["ms_cmd"], stroke=UI["cardline"], sw=1))
-    cmds = [("+", "New"), ("✔", "Save"), ("↻", "Refresh"), ("⚑", "Flow"),
-            ("…", "More")]
-    cx = x + 16
+    s.append(txt(x + 16, y2 + cb/2 + 4.5, "←", size=13, color=pf["primary"], weight="700"))
+    cx = x + 40
+    cmds = [("➕", "New"), ("\U0001F4BE", "Save"), ("✓", "Save & Close"),
+            ("↻", "Refresh"), ("⚑", "Flow"), ("⋯", "More")]
     for ic, lb in cmds:
-        s.append(txt(cx, y2 + cb/2 + 4, ic, size=11, color=pf["primary"], weight="700"))
-        s.append(txt(cx + 14, y2 + cb/2 + 4, lb, size=10.5, color=UI["ink"], weight="600"))
-        cx += 22 + len(lb) * 6.4 + 16
-    # left sitemap rail
+        s.append(txt(cx, y2 + cb/2 + 4.5, ic, size=10.5, color=pf["primary"], weight="700"))
+        s.append(txt(cx + 15, y2 + cb/2 + 4.5, lb, size=10.4, color=UI["ink"], weight="600"))
+        cx += 22 + len(lb) * 6.2 + 14
+    # right side: view selector
+    s.append(rrect(x + w - 196, y2 + 6, 184, cb - 12, r=4, fill="#fff", stroke=UI["cardline"], sw=1))
+    s.append(txt(x + w - 186, y2 + cb/2 + 4, "Active records  ▾", size=9.6, color=UI["sub"], weight="600"))
+    # ---- left sitemap rail ----
     y3 = y2 + cb
-    rail = 150
+    rail = 158
     s.append(rrect(x, y3, rail, y + h - y3, fill="#FAFBFC", stroke=UI["cardline"], sw=1))
-    nav = [("search", "Search"), ("user360", "Customers"), ("case", "Cases"),
-           ("clock", "SLA / Queues"), ("people", "Accounts"), ("pbi", "Dashboards"),
-           ("flow", "Workflows")]
-    ny = y3 + 14
-    for i, (g, lb) in enumerate(nav):
-        act = (i == 1)
+    s.append(txt(x + 14, y3 + 22, appname.upper(), size=9, color=UI["faint"], weight="800", spacing="0.5"))
+    s.append(line(x + 12, y3 + 30, x + rail - 12, y3 + 30, color=UI["cardline"], w=1))
+    nav = [("search", "Search", False), ("user360", "Customers", True), ("case", "Cases", False),
+           ("clock", "SLA / Queues", False), ("people", "Accounts", False),
+           ("pbi", "Dashboards", False), ("flow", "Workflows", False)]
+    ny = y3 + 42
+    for g, lb, act in nav:
         if act:
             s.append(rrect(x, ny - 4, rail, 30, fill="#EAF2FB"))
             s.append(rrect(x, ny - 4, 3, 30, fill=pf["primary"]))
-        s.append(mini_chip(g, pf["primary"], x + 12, ny, 18))
-        s.append(txt(x + 38, ny + 13, lb, size=10.4,
+        s.append(mini_chip(g, pf["primary"], x + 14, ny, 18))
+        s.append(txt(x + 40, ny + 13, lb, size=10.4,
                      color=UI["ink"] if act else UI["sub"], weight="700" if act else "600"))
         ny += 32
+    # area switcher (bottom)
+    s.append(line(x + 12, y + h - 40, x + rail - 12, y + h - 40, color=UI["cardline"], w=1))
+    s.append(txt(x + 14, y + h - 20, "Customer Service  ▴", size=9.6, color=pf["primary"], weight="700"))
     cont = (x + rail, y3, w - rail, y + h - y3)
-    # page bg
     s.append(rrect(cont[0], cont[1], cont[2], cont[3], fill=UI["page_ms"]))
     return "".join(s), cont
 
 
+def _ms_appname(breadcrumb):
+    b = breadcrumb.lower()
+    if "sales" in b or "opportun" in b or "pipeline" in b:
+        return "Sales Hub"
+    if "dashboard" in b or "analytics" in b:
+        return "Customer Service"
+    if "setup" in b or "security" in b or "maker" in b or "integration" in b:
+        return "Power Platform admin"
+    return "Customer Service"
+
+
 def _chrome_sf(pf, x, y, w, h, breadcrumb, record_title):
     s = []
-    # global header (white)
-    hb = 38
-    s.append(rrect(x, y, w, hb, fill=UI["sf_hdr"], stroke=UI["sf_hdrline"], sw=1))
-    s.append(waffle(x + 16, y + hb/2 - 5, c="#747474", s=2.8, gap=2.2))
-    s.append(sf_cloud(x + 44, y + hb/2, 11, c=pf["primary"]))
-    s.append(txt(x + 62, y + hb/2 + 4, "QICIRCO CRM", size=12, color="#16325C", weight="700"))
-    # search
-    s.append(rrect(x + w/2 - 170, y + 7, 340, hb - 14, r=6, fill="#F3F3F3", stroke="#DDDBDA", sw=1))
-    s.append(txt(x + w/2 - 158, y + hb/2 + 3.4, "⌕  Search Salesforce...", size=9.6,
-                 color=UI["faint"], weight="500"))
-    rx = x + w - 18
-    for lbl in ["⚙", "?", "○", "★"]:
-        s.append(txt(rx, y + hb/2 + 4, lbl, size=12, color="#706E6B", anchor="end"))
+    appname, appcolor, tabs, active_tab = _sf_app(breadcrumb)
+    # ---- global header (dark blue Lightning bar) ----
+    hb = 40
+    s.append(rrect(x, y, w, hb, fill="#16325C"))
+    s.append(waffle(x + 18, y + hb/2 - 5, c="#ffffff", s=3.0, gap=2.4))
+    s.append(txt(x + 42, y + hb/2 + 4, "⋮⋮⋮", size=6, color="#fff", weight="400"))
+    # search (big, center-left)
+    s.append(rrect(x + 150, y + 8, w - 340, hb - 16, r=6, fill="#0b264a"))
+    s.append(txt(x + 166, y + hb/2 + 3.6, "⌕   Search Salesforce", size=10, color="#9DB4CE", weight="500"))
+    rx = x + w - 20
+    for lbl in ["✦", "?", "⚙", "🔔", "▦"]:
+        s.append(txt(rx, y + hb/2 + 4.5, lbl, size=11, color="#C8D6E6", anchor="end"))
         rx -= 24
-    s.append(avatar(x + w - 20, y + hb/2, 11, "SA", pf["primary"]))
-    # app nav bar
+    s.append(avatar(x + w - 22, y + hb/2, 11, "SA", "#C9A24B"))
+    # ---- app nav bar (white) ----
     y2 = y + hb
-    nb = 40
+    nb = 42
     s.append(rrect(x, y2, w, nb, fill="#FFFFFF", stroke=UI["sf_hdrline"], sw=1))
-    s.append(mini_chip("case", pf["primary"], x + 14, y2 + 9, 22, cloud=True))
-    s.append(txt(x + 44, y2 + nb/2 + 4, "Service", size=12.5, color="#16325C", weight="800"))
-    tabs = ["Home", "Cases", "Accounts", "Contacts", "Reports", "Dashboards", "More ▾"]
-    tx = x + 120
+    s.append(rrect(x + 14, y2 + 9, 26, 24, r=6, fill=appcolor))
+    s.append(sf_cloud(x + 27, y2 + 21, 8, c="#fff"))
+    s.append(txt(x + 48, y2 + nb/2 + 4, appname, size=12.5, color="#080707", weight="800"))
+    s.append(txt(x + 48 + len(appname) * 7.4 + 6, y2 + nb/2 + 4, "▾", size=9, color=UI["sub"]))
+    tx = x + 60 + len(appname) * 7.6 + 26
     for i, t in enumerate(tabs):
-        act = (i == 1)
-        s.append(txt(tx, y2 + nb/2 + 4, t, size=10.8,
-                     color="#16325C" if act else UI["sub"], weight="700" if act else "600"))
-        twd = len(t) * 7 + 22
+        act = (i == active_tab)
+        s.append(txt(tx, y2 + nb/2 + 4, t, size=10.6,
+                     color="#080707" if act else "#3E3E3C", weight="700" if act else "500"))
+        twd = len(t) * 6.8 + 26
         if act:
-            s.append(rrect(tx - 2, y2 + nb - 3, twd - 14, 3, fill=UI["sf_navblue"]))
+            s.append(rrect(tx - 3, y2 + nb - 3, twd - 18, 3, fill=UI["sf_navblue"]))
         tx += twd
     y3 = y2 + nb
-    cont = (x, y3, w, y + h - y3)
+    # ---- utility bar (bottom, dark) — Service Console signature ----
+    ub = 30
+    uby = y + h - ub
+    s.append(rrect(x, uby, w, ub, fill="#032D60"))
+    utils = [("🎧", "Omni-Channel"), ("●", "Available"), ("☎", "Phone"),
+             ("🕘", "History"), ("📝", "Notes"), ("⚡", "Macros")]
+    ux = x + 16
+    for i, (ic, lb) in enumerate(utils):
+        col = "#4BCA81" if lb == "Available" else "#C8D6E6"
+        s.append(txt(ux, uby + ub/2 + 4, ic, size=10, color=col))
+        s.append(txt(ux + 16, uby + ub/2 + 4, lb, size=9.4, color="#DCE8F5", weight="600"))
+        ux += 22 + len(lb) * 6.2 + 20
+        if i == 1:
+            ux += 6
+    s.append(txt(x + w - 16, uby + ub/2 + 4, "QICIRCO · Lightning Experience", size=8.8,
+                 color="#7f9ab8", weight="500", anchor="end"))
+    cont = (x, y3, w, uby - y3)
     s.append(rrect(cont[0], cont[1], cont[2], cont[3], fill=UI["page_sf"]))
     return "".join(s), cont
+
+
+def _sf_app(breadcrumb):
+    b = breadcrumb.lower()
+    if "sales" in b or "opportun" in b or "pipeline" in b:
+        return "Sales", "#0D9DDA", ["Home", "Leads", "Opportunities", "Accounts", "Contacts", "Reports", "More ▾"], 2
+    if "dashboard" in b or "analytics" in b:
+        return "Analytics", "#E8762D", ["Home", "Dashboards", "Reports", "Cases", "Accounts", "More ▾"], 1
+    if "setup" in b or "security" in b:
+        return "Setup", "#706E6B", ["Home", "Users", "Profiles", "Permission Sets", "Security", "More ▾"], 4
+    if "maker" in b or "flow" in b:
+        return "Platform", "#032D60", ["Home", "Flows", "Objects", "Apps", "More ▾"], 1
+    if "integration" in b or "mulesoft" in b:
+        return "Integration", "#00A0DF", ["Home", "APIs", "Runtimes", "Monitoring", "More ▾"], 3
+    return "Service", "#1B96FF", ["Home", "Cases", "Accounts", "Contacts", "Knowledge", "Reports", "More ▾"], 1
 
 
 # ------------------------------------------------------------------ callouts + requirement rail

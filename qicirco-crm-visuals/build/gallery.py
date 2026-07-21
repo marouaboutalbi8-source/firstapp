@@ -11,6 +11,8 @@ DIAGRAMS = [
      "Omnichannel capture to audited resolution: classify, route, SLA timers, multi-level escalation and automation scenarios."),
     ("04-capability-map", "Functional Capability Map",
      "Five capability domains mapped to product components, serving six operational departments."),
+    ("05-roadmap", "Implementation Roadmap & Phasing",
+     "Governed five-phase delivery schedule (20–24 weeks to go-live) plus the four-phase capability roadmap."),
 ]
 
 HEAD = """<header>
