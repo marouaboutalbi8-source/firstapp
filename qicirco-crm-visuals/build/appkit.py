@@ -437,6 +437,77 @@ def gauge_ring(cx, cy, r, pct, color, label, value):
     return "".join(s)
 
 
+def list_view(pf, x, y, w, h, view_name, count, cols, colw, rows, buttons,
+              rowh=34, chart=None):
+    """Authentic CRM list/grid landing view (D365 entity grid / SF list view)."""
+    prim = pf["primary"]
+    s = []
+    # toolbar
+    tbh = 40
+    s.append(rrect(x, y, w, tbh, fill="#fff", stroke=UI["cardline"], sw=1))
+    if pf["key"] == "microsoft":
+        s.append(txt(x + 16, y + tbh/2 + 5, view_name + "  ▾", size=14, color=UI["ink"], weight="800"))
+    else:
+        s.append(mini_chip("case", prim, x + 14, y + 9, 22, cloud=True))
+        s.append(txt(x + 44, y + tbh/2 - 1, view_name, size=13, color="#080707", weight="800"))
+        s.append(txt(x + 44, y + tbh/2 + 13, f"{count} items · sorted by modified", size=8.6, color=UI["sub"], weight="500"))
+    # right buttons
+    bx = x + w - 12
+    for lb in reversed(buttons):
+        bw = len(lb) * 6.6 + 22
+        bx -= bw
+        primary_btn = (lb == buttons[-1])
+        s.append(rrect(bx, y + 7, bw, tbh - 14, r=5,
+                       fill=(prim if primary_btn else "#fff"),
+                       stroke=(prim if not primary_btn else None), sw=1.2))
+        s.append(txt(bx + bw/2, y + tbh/2 + 4, lb, size=9.6,
+                     color=("#fff" if primary_btn else prim), weight="700", anchor="middle"))
+        bx -= 8
+    # search (ms shows count on right; sf search left of buttons)
+    if pf["key"] == "microsoft":
+        s.append(rrect(x + w - 470, y + 8, 190, tbh - 16, r=5, fill=UI["field"], stroke=UI["cardline"], sw=1))
+        s.append(txt(x + w - 458, y + tbh/2 + 3.5, "⌕ Filter by keyword", size=9, color=UI["faint"], weight="500"))
+    gy = y + tbh + 8
+    gw = w - (chart[0] if chart else 0)
+    # grid header
+    s.append(rrect(x, gy, gw, h - tbh - 8, r=8, fill="#fff", stroke=UI["cardline"], sw=1))
+    hh = 30
+    s.append(rrect(x, gy, gw, hh, r=8, fill="#F4F6F9"))
+    s.append(rrect(x, gy + hh - 8, gw, 8, fill="#F4F6F9"))
+    # checkbox col
+    s.append(f'<rect x="{x+14}" y="{gy+hh/2-6}" width="12" height="12" rx="2.5" fill="#fff" stroke="{UI["faint"]}" stroke-width="1.4"/>')
+    cxp = x + 40
+    for i, c in enumerate(cols):
+        s.append(txt(cxp, gy + hh/2 + 4, c + (" ▾" if i == 0 else ""), size=9.4, color=UI["sub"], weight="800"))
+        cxp += colw[i]
+    ry = gy + hh
+    for ri, row in enumerate(rows):
+        if ri % 2 == 1:
+            s.append(rrect(x + 2, ry, gw - 4, rowh, fill="#FAFBFC"))
+        s.append(f'<rect x="{x+14}" y="{ry+rowh/2-6}" width="12" height="12" rx="2.5" fill="#fff" stroke="{UI["faint"]}" stroke-width="1.4"/>')
+        cxp = x + 40
+        for ci, cell in enumerate(row):
+            if isinstance(cell, tuple) and cell and cell[0] == "pill":
+                _, lbl, bg, fg = cell
+                s.append(chip(cxp, ry + rowh/2 - 8, len(lbl)*6.2 + 18, 16, lbl, bg, text_color=fg, size=8.6, r=8))
+            elif isinstance(cell, tuple):
+                val, col = cell
+                s.append(txt(cxp, ry + rowh/2 + 4, val, size=9.6, color=col,
+                             weight="700" if ci == 0 else "600"))
+            else:
+                s.append(txt(cxp, ry + rowh/2 + 4, cell, size=9.6,
+                             color=(prim if ci == 0 else UI["ink"]),
+                             weight="700" if ci == 0 else "500"))
+            cxp += colw[ci]
+        s.append(line(x + 10, ry + rowh, x + gw - 10, ry + rowh, color=UI["cardline"], w=0.7))
+        ry += rowh
+    # footer count (ms)
+    if pf["key"] == "microsoft":
+        s.append(txt(x + 16, gy + h - tbh - 8 - 12, f"1 - {len(rows)} of {count}", size=9, color=UI["sub"], weight="600"))
+        s.append(txt(x + gw - 16, gy + h - tbh - 8 - 12, "◀  Page 1  ▶", size=9, color=UI["sub"], weight="600", anchor="end"))
+    return "".join(s), (x + gw + 12, gy, (chart[0] - 12) if chart else 0, h - tbh - 8)
+
+
 def phone_frame(x, y, w, h, pf):
     """A phone device frame; returns (svg, inner box)."""
     s = [rrect(x, y, w, h, r=22, fill="#1B2733")]

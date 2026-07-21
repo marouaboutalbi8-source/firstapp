@@ -1479,6 +1479,236 @@ def c_r17(pf, ax, ay, aw, ah, req):
     return "".join(s)
 
 
+# ================================================= list/landing views
+def _rightpanel(pf, box, title, kind, prim):
+    x, y, w, h = box
+    if w < 40:
+        return ""
+    s = [card(x, y, w, h, title, "pbi", prim, pf=pf)]
+    if kind == "donut":
+        s.append(donut(x + w/2, y + 108, min(w*0.28, 58),
+                       [(46, "#C0392B"), (32, "#E8A33D"), (22, "#0B875B")]))
+        ly = y + 168
+        for lbl, cc in [("High 46%", "#C0392B"), ("Medium 32%", "#E8A33D"), ("Low 22%", "#0B875B")]:
+            s.append(f'<rect x="{x+20}" y="{ly-9}" width="11" height="11" rx="2" fill="{cc}"/>')
+            s.append(txt(x + 38, ly, lbl, size=9.6, color=UI["ink"], weight="600"))
+            ly += 22
+    elif kind == "bars":
+        s.append(bars(x + 20, y + 60, w - 44, 120, [42, 30, 22, 14, 9], prim,
+                      labels=["New", "Qual", "Prop", "Neg", "Won"]))
+        s.append(txt(x + 20, y + 200, "Pipeline QAR 4.8M", size=10, color=UI["ink"], weight="700"))
+    elif kind == "filters":
+        fy = y + 56
+        for f in ["Status", "Priority", "Department", "Channel", "Owner", "Modified"]:
+            s.append(rrect(x + 14, fy, w - 28, 28, r=6, fill=UI["field"], stroke=UI["cardline"], sw=1))
+            s.append(txt(x + 24, fy + 18, f + "  ▾", size=9.4, color=UI["ink"], weight="600"))
+            fy += 34
+    elif kind == "segment":
+        s.append(donut(x + w/2, y + 108, min(w*0.28, 58),
+                       [(58, prim), (26, "#3E7CB1"), (16, "#7A5CC0")]))
+        ly = y + 168
+        for lbl, cc in [("Corporate 58%", prim), ("Retail 26%", "#3E7CB1"), ("SME 16%", "#7A5CC0")]:
+            s.append(f'<rect x="{x+20}" y="{ly-9}" width="11" height="11" rx="2" fill="{cc}"/>')
+            s.append(txt(x + 38, ly, lbl, size=9.6, color=UI["ink"], weight="600"))
+            ly += 22
+    return "".join(s)
+
+
+PILL = lambda l, bg, fg: ("pill", l, bg, fg)
+HI = PILL("High", "#FDECEC", "#B4342B")
+MED = PILL("Medium", "#FBF1DA", "#8A6D1E")
+LOW = PILL("Low", "#E4F5EC", "#0B875B")
+
+
+R18 = dict(
+    id="FR-3", headline="Case Queue — List View", title="Case List / Queue View",
+    sources=["RFP §5.2", "BRD §11.2 / §12.1", "Proposal FR-3"],
+    text=["The everyday agent landing: a filtered, sortable list of cases by view.",
+          "Inline priority/status, SLA and owner; bulk actions from the command bar.",
+          "Personal and shared views per department queue."],
+    addressed=["A saved view selector switches between personal and departmental queues.",
+               "Sortable columns with inline priority and status indicators.",
+               "SLA and ownership are visible per row for at-a-glance triage.",
+               "Charts / filters give supervisors instant queue insight."],
+)
+
+
+def c_r18(pf, ax, ay, aw, ah, req):
+    prim = pf["primary"]
+    win, (cx, cy, cw, ch) = _content(pf, ax, ay, aw, ah, "Cases  ›  Active Cases", "Cases")
+    s = [win]
+    ix, iw = cx + 16, cw - 32
+    top = cy + 14
+    cols = ["Case", "Customer", "Priority", "Status", "SLA", "Owner"]
+    colw = [iw*0.14, iw*0.2, iw*0.13, iw*0.15, iw*0.12, iw*0.13]
+    OPEN = PILL("In progress", "#EAF2FB", prim)
+    NEW = PILL("New", "#EDEDED", "#3E3E3C")
+    RES = PILL("Resolved", "#E4F5EC", "#0B875B")
+    rows = [
+        ["INC-2043", "Ahmed Al-Kuwari", HI, OPEN, ("01:07", "#C0392B"), "M. Haddad"],
+        ["TKT-3120", "F. Al-Ansari", MED, OPEN, "03:40", "S. Kamal"],
+        ["CMP-3021", "F. Al-Ansari", HI, NEW, ("00:22", "#C0392B"), "M. Haddad"],
+        ["TKT-3126", "Ooredoo Q.S.C.", LOW, NEW, "2d", "Unassigned"],
+        ["INC-2051", "K. Rahman", HI, OPEN, ("00:34", "#C0392B"), "L. Fahad"],
+        ["TKT-3130", "Qatar Steel", LOW, OPEN, "2d", "A. Nabil"],
+        ["TKT-3134", "Doha Bank", MED, OPEN, "05:10", "S. Kamal"],
+        ["INC-2055", "Mannai Corp.", HI, RES, "met", "M. Haddad"],
+        ["TKT-3140", "Al Meera Group", LOW, RES, "met", "A. Nabil"],
+    ]
+    lv, box = list_view(pf, ix, top, iw, cy + ch - top - 14, "My Active Cases", 312,
+                        cols, colw, rows, ["Export", "Edit", "+ New Case"], chart=(iw*0.24,))
+    s.append(lv)
+    s.append(_rightpanel(pf, box, "Cases by priority", "donut", prim))
+    s.append(callout(1, ix + 150, top + 6))
+    s.append(callout(2, ix + iw*0.4, top + 52))
+    s.append(callout(3, ix + iw*0.55, top + 92))
+    s.append(callout(4, box[0] + box[2] - 12, box[1] + 12))
+    return "".join(s)
+
+
+R19 = dict(
+    id="FR-1", headline="Customer List View", title="Customer / Account List",
+    sources=["RFP §5.1", "BRD §7.1", "Proposal FR-1"],
+    text=["Governed customer/account list resolved from the Customer Master DB.",
+          "Search and filter by segment, owner and policy footprint.",
+          "Drill into any record for the full Customer 360."],
+    addressed=["List is populated from the governed master — read-only, no duplicates.",
+               "Filter by segment, owner, city and policy count.",
+               "Enterprise ID is the consistent key across every row.",
+               "One click opens the full governed Customer 360."],
+)
+
+
+def c_r19(pf, ax, ay, aw, ah, req):
+    prim = pf["primary"]
+    win, (cx, cy, cw, ch) = _content(pf, ax, ay, aw, ah, "Customers  ›  Active Customers", "Customers")
+    s = [win]
+    ix, iw = cx + 16, cw - 32
+    top = cy + 14
+    cols = ["Name", "Enterprise ID", "Segment", "Policies", "Owner", "City"]
+    colw = [iw*0.2, iw*0.17, iw*0.14, iw*0.1, iw*0.14, iw*0.1]
+    CORP = PILL("Corporate", "#EAF2FB", prim)
+    RET = PILL("Retail", "#EDF3FB", "#3E7CB1")
+    rows = [
+        ["Ahmed Al-Kuwari", "QIC-CUST-004182", CORP, "3", "N. Al-Sadi", "Doha"],
+        ["Ooredoo Q.S.C.", "QIC-CUST-002210", CORP, "6", "N. Al-Sadi", "Doha"],
+        ["Fatima Al-Ansari", "QIC-CUST-006654", RET, "2", "S. Kamal", "Al Wakrah"],
+        ["Qatar Steel", "QIC-CUST-001098", CORP, "4", "N. Al-Sadi", "Mesaieed"],
+        ["Khalid Rahman", "QIC-CUST-008321", RET, "1", "A. Nabil", "Doha"],
+        ["Mannai Corporation", "QIC-CUST-003377", CORP, "5", "N. Al-Sadi", "Doha"],
+        ["Al Meera Group", "QIC-CUST-002984", CORP, "3", "N. Al-Sadi", "Doha"],
+        ["Doha Bank", "QIC-CUST-001540", CORP, "7", "N. Al-Sadi", "Doha"],
+        ["Sara Ibrahim", "QIC-CUST-009011", RET, "2", "A. Nabil", "Lusail"],
+    ]
+    lv, box = list_view(pf, ix, top, iw, cy + ch - top - 14, "Active Customers", 48120,
+                        cols, colw, rows, ["Export", "+ New"], chart=(iw*0.24,))
+    s.append(lv)
+    s.append(_rightpanel(pf, box, "By segment", "segment", prim))
+    s.append(callout(1, ix + 150, top + 6))
+    s.append(callout(2, ix + iw*0.42, top + 92))
+    s.append(callout(3, ix + iw*0.3, top + 92))
+    s.append(callout(4, box[0] + box[2] - 12, box[1] + 12))
+    return "".join(s)
+
+
+R20 = dict(
+    id="FR-7", headline="Opportunity Pipeline — List View", title="Opportunity List",
+    sources=["RFP §5.5", "BRD §7.5", "Proposal FR-7"],
+    text=["Sales list of open opportunities with stage, value and close date.",
+          "Owned by salesperson; forecastable and filterable.",
+          "Complements the Kanban pipeline board."],
+    addressed=["Open opportunities listed with stage, amount and close date.",
+               "Ownership is explicit; sales manager can filter by owner.",
+               "Weighted value rolls up for the forecast.",
+               "Stage pills give instant pipeline health."],
+)
+
+
+def c_r20(pf, ax, ay, aw, ah, req):
+    prim = pf["primary"]
+    win, (cx, cy, cw, ch) = _content(pf, ax, ay, aw, ah, "Sales  ›  My Open Opportunities", "Opportunities")
+    s = [win]
+    ix, iw = cx + 16, cw - 32
+    top = cy + 14
+    cols = ["Opportunity", "Account", "Stage", "Amount (QAR)", "Close", "Owner"]
+    colw = [iw*0.2, iw*0.16, iw*0.15, iw*0.14, iw*0.1, iw*0.1]
+    def stg(l, c): return PILL(l, "#EEF3F8", c)
+    rows = [
+        ["Ooredoo staff medical", "Ooredoo Q.S.C.", stg("Qualified", "#3E7CB1"), "900,000", "12 Sep", "N. Al-Sadi"],
+        ["Qatar Steel group life", "Qatar Steel", stg("Proposal", prim), "640,000", "30 Aug", "N. Al-Sadi"],
+        ["Al Meera fleet motor", "Al Meera Group", stg("New", "#94A3B2"), "480,000", "05 Oct", "R. Karim"],
+        ["Doha Bank motor fleet", "Doha Bank", stg("Negotiation", "#E8A33D"), "380,000", "22 Aug", "N. Al-Sadi"],
+        ["Woqod fleet renewal", "Woqod", stg("Qualified", "#3E7CB1"), "220,000", "18 Sep", "R. Karim"],
+        ["Katara property", "Katara Hosp.", stg("New", "#94A3B2"), "150,000", "11 Oct", "R. Karim"],
+        ["Mannai medical top-up", "Mannai Corp.", stg("Won", "#0B875B"), "520,000", "closed", "N. Al-Sadi"],
+    ]
+    lv, box = list_view(pf, ix, top, iw, cy + ch - top - 14, "My Open Opportunities", 18,
+                        cols, colw, rows, ["Export", "+ New"], chart=(iw*0.24,))
+    s.append(lv)
+    s.append(_rightpanel(pf, box, "Pipeline by stage", "bars", prim))
+    s.append(callout(1, ix + 150, top + 6))
+    s.append(callout(2, ix + iw*0.3, top + 92))
+    s.append(callout(3, ix + iw*0.63, top + 92))
+    s.append(callout(4, box[0] + box[2] - 12, box[1] + 12))
+    return "".join(s)
+
+
+R21 = dict(
+    id="FR-8", headline="Reports & Dashboards Library", title="Reports & Dashboards",
+    sources=["RFP §5.6 / §10.2", "BRD §12.3", "Proposal FR-8"],
+    text=["A governed library of operational and management reports and dashboards.",
+          "Scheduled delivery, export to Excel/PDF/CSV, role-based folders.",
+          "Self-service report building for authorized users."],
+    addressed=["Reports and dashboards are organized in role-based folders.",
+               "Each report can be scheduled and subscribed to.",
+               "Export to Excel, PDF and CSV is built in.",
+               "Featured dashboards surface the KPIs management needs."],
+)
+
+
+def c_r21(pf, ax, ay, aw, ah, req):
+    prim = pf["primary"]
+    tool = "Power BI" if pf["key"] == "microsoft" else "CRM Analytics"
+    win, (cx, cy, cw, ch) = _content(pf, ax, ay, aw, ah, f"Reports  ›  Shared reports ({tool})", "Reports")
+    s = [win]
+    ix, iw = cx + 16, cw - 32
+    top = cy + 14
+    cols = ["Report name", "Type", "Folder", "Owner", "Subscribed"]
+    colw = [iw*0.26, iw*0.12, iw*0.18, iw*0.14, iw*0.1]
+    RPT = PILL("Report", "#EAF2FB", prim)
+    DSH = PILL("Dashboard", "#F3EEFB", "#7A5CC0")
+    YES = PILL("Weekly", "#E4F5EC", "#0B875B")
+    rows = [
+        ["Operational — Open cases by dept", RPT, "Customer Service", "Admin", YES],
+        ["SLA compliance & breaches", DSH, "Management", "Admin", YES],
+        ["Escalation trends", RPT, "Management", "Admin", PILL("Daily", "#E4F5EC", "#0B875B")],
+        ["Interaction volumes by channel", DSH, "Operations", "Admin", YES],
+        ["Sales pipeline & forecast", DSH, "Sales & BD", "N. Al-Sadi", PILL("—", "#EDEDED", "#3E3E3C")],
+        ["Complaints & QCB register", RPT, "Complaints", "Compliance", YES],
+        ["Case aging distribution", RPT, "Customer Service", "Admin", PILL("—", "#EDEDED", "#3E3E3C")],
+        ["Executive KPI summary", DSH, "Executive", "Admin", YES],
+    ]
+    lv, box = list_view(pf, ix, top, iw, cy + ch - top - 14, "All Reports & Dashboards", 64,
+                        cols, colw, rows, ["Schedule", "Export", "+ New Report"], chart=(iw*0.24,))
+    s.append(lv)
+    x2, y2, w2, h2 = box
+    if w2 > 40:
+        s.append(card(x2, y2, w2, h2, "Featured dashboards", "pbi", prim, pf=pf))
+        fy = y2 + 52
+        for nm, cc in [("Executive KPI", "#7A5CC0"), ("SLA compliance", "#0B875B"),
+                       ("Operations live", prim), ("Sales forecast", "#E8A33D")]:
+            s.append(rrect(x2 + 14, fy, w2 - 28, 44, r=8, fill=UI["field"], stroke=UI["cardline"], sw=1))
+            s.append(rrect(x2 + 14, fy, 4, 44, r=2, fill=cc))
+            s.append(mini_chip("pbi", cc, x2 + 24, fy + 11, 22))
+            s.append(txt(x2 + 54, fy + 27, nm, size=10, color=UI["ink"], weight="700"))
+            fy += 52
+    s.append(callout(1, ix + 150, top + 6))
+    s.append(callout(2, box[0] - 6 if w2 > 40 else ix + iw*0.7, top + 92))
+    s.append(callout(3, ix + iw*0.62, top + 6))
+    s.append(callout(4, box[0] + box[2] - 12, box[1] + 12) if w2 > 40 else "")
+    return "".join(s)
+
+
 CARDS = [
     ("r1-customer360", R1, c_r1),
     ("r2-interaction-log", R2, c_r2),
@@ -1497,6 +1727,10 @@ CARDS = [
     ("r15-knowledge", R15, c_r15),
     ("r16-complaints", R16, c_r16),
     ("r17-executive", R17, c_r17),
+    ("r18-case-list", R18, c_r18),
+    ("r19-customer-list", R19, c_r19),
+    ("r20-opportunity-list", R20, c_r20),
+    ("r21-reports-library", R21, c_r21),
 ]
 
 

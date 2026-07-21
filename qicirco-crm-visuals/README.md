@@ -49,6 +49,10 @@ python3 build/diagrams.py all && python3 build/render.py`.
 | FR-KB | Knowledge Management & Self-service Deflection | RFP §5.2; BRD §17.2 / §3.1; Proposal — knowledge & FCR | `png/ms-r15-knowledge.png` | `png/sf-r15-knowledge.png` |
 | FR-Cmp | Complaints Management & Regulatory Handling | RFP §5.2 / §15; BRD §11.5 / §2.3; Proposal — Complaints dept. | `png/ms-r16-complaints.png` | `png/sf-r16-complaints.png` |
 | FR-Exec | Executive & Management Reporting | RFP §10.2; BRD §12.2 / §13.3; Proposal — management visibility | `png/ms-r17-executive.png` | `png/sf-r17-executive.png` |
+| FR-3 | Case Queue — List View | RFP §5.2; BRD §11.2 / §12.1; Proposal FR-3 | `png/ms-r18-case-list.png` | `png/sf-r18-case-list.png` |
+| FR-1 | Customer List View | RFP §5.1; BRD §7.1; Proposal FR-1 | `png/ms-r19-customer-list.png` | `png/sf-r19-customer-list.png` |
+| FR-7 | Opportunity Pipeline — List View | RFP §5.5; BRD §7.5; Proposal FR-7 | `png/ms-r20-opportunity-list.png` | `png/sf-r20-opportunity-list.png` |
+| FR-8 | Reports & Dashboards Library | RFP §5.6 / §10.2; BRD §12.3; Proposal FR-8 | `png/ms-r21-reports-library.png` | `png/sf-r21-reports-library.png` |
 
 ## Layout
 
